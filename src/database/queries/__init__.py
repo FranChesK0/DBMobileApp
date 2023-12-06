@@ -1,5 +1,6 @@
-from .queries import create_tables
+from .queries import create_tables, insert
 
 __all__ = [
-    "create_tables"
+    "create_tables",
+    "insert"
 ]
