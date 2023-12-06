@@ -4,7 +4,7 @@ from logging import config
 
 from . import Env
 
-config.fileConfig("data\\logging.conf")
+config.fileConfig(f"{Env.ROOT_DIR}\\data\\logging.conf")
 
 
 class LoggerName(Enum):
