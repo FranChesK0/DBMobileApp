@@ -1,13 +1,16 @@
 from datetime import datetime
 
 from sqlalchemy import ForeignKey
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
-from .database import session_factory, Base
 from database.database_types import int_pk, VisitStatus, DoctorSpecialty, DoctorCategory, Gender
 
 
-class Visit(Base):
+class BaseModel(DeclarativeBase):
+    pass
+
+
+class Visit(BaseModel):
     __tablename__ = "visit"
 
     VisitNumber: Mapped[int_pk]
@@ -19,7 +22,7 @@ class Visit(Base):
     Status: Mapped[VisitStatus]
 
 
-class Doctor(Base):
+class Doctor(BaseModel):
     __tablename__ = "doctor"
 
     ServiceNumber: Mapped[int_pk]
@@ -30,7 +33,7 @@ class Doctor(Base):
     Section: Mapped[int]
 
 
-class Patient(Base):
+class Patient(BaseModel):
     __tablename__ = "patient"
 
     MedicalCard: Mapped[int_pk]
@@ -43,21 +46,21 @@ class Patient(Base):
     Section: Mapped[int | None] = mapped_column(ForeignKey("section.id", ondelete="SET NULL"))
 
 
-class Section(Base):
+class Section(BaseModel):
     __tablename__ = "section"
 
     id: Mapped[int_pk]
     Addresses: Mapped[str]
 
 
-class Diagnose(Base):
+class Diagnose(BaseModel):
     __tablename__ = "diagnose"
 
     id: Mapped[int_pk]
     Name: Mapped[str]
 
 
-class Purpose(Base):
+class Purpose(BaseModel):
     __tablename__ = "purpose"
 
     id: Mapped[int_pk]

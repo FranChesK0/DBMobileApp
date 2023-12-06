@@ -1,18 +1,10 @@
-from .database import engine, session_factory, Base
-from .models import Visit, Doctor, Patient, Section, Diagnose, Purpose
+from .database import engine, session_factory
 from . import database_types
+from . import models
 
 __all__ = [
     "engine",
     "session_factory",
-    "Base",
-
-    "Visit",
-    "Doctor",
-    "Patient",
-    "Section",
-    "Diagnose",
-    "Purpose",
-
     "database_types",
+    "models"
 ]
