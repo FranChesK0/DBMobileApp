@@ -17,8 +17,5 @@ class LoggerName(Enum):
 
 def get_logger(name: LoggerName = LoggerName.NONE) -> logging.Logger:
     if Env.DEBUG:
-        print(LoggerName.DEBUG.value)
         return logging.getLogger(LoggerName.DEBUG.value)
-    # TODO: delete print
-    print(name.value if name.value is not None else LoggerName.ROOT.value)
     return logging.getLogger(name.value if name.value is not None else LoggerName.ROOT.value)
