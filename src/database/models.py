@@ -4,7 +4,7 @@ from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
 
 from .database import session_factory, Base
-from database_types import int_pk, VisitStatus, DoctorSpecialty, DoctorCategory, Gender
+from database.database_types import int_pk, VisitStatus, DoctorSpecialty, DoctorCategory, Gender
 
 
 class Visit(Base):
@@ -47,7 +47,7 @@ class Section(Base):
     __tablename__ = "section"
 
     id: Mapped[int_pk]
-    Addresses: Mapped[list[str]]
+    Addresses: Mapped[str]
 
 
 class Diagnose(Base):
