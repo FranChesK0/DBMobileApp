@@ -1,7 +1,7 @@
 from sqlalchemy import select
 
 from database import engine, session_factory
-from database.models import BaseModel
+from database.models import BaseModel, BaseModelType
 from misc import LoggerName, get_logger
 
 logger = get_logger(LoggerName.DATABASE)
@@ -21,7 +21,7 @@ def insert(orm: BaseModel | list[BaseModel]) -> None:
         session.commit()
 
 
-def select_all(orm: type[BaseModel]) -> list[BaseModel]:
+def select_all(orm: type[BaseModelType]) -> list[BaseModelType]:
     with session_factory() as session:
         query = select(orm)
         return list(session.execute(query).scalars().all())
