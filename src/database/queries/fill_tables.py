@@ -69,7 +69,7 @@ def _fill_patient_table(fake: Faker, num: int) -> None:
         last_name = fake.last_name_male() if gender == database_types.Gender.male else fake.last_name_female()
         middle_name = fake.middle_name_male() if gender == database_types.Gender.male else fake.middle_name_female()
         first_name = fake.first_name_male() if gender == database_types.Gender.male else fake.first_name_female()
-        full_name = f"{last_name} {middle_name} {first_name}"
+        full_name = f"{last_name} {first_name} {middle_name}"
         section = fake.random_element(elements=queries.select_all(models.Section))
         patients.append(models.Patient(medicalCard=str(fake.numerify(text="%%%%%%%%%%%%")),
                                        insurancePolicy=str(fake.numerify(text="%%%%%%%%%%%")),
@@ -86,8 +86,12 @@ def _fill_doctor_table(fake: Faker, num: int) -> None:
     doctors = []
     for _ in range(num):
         section = fake.random_element(elements=queries.select_all(models.Section))
+        last_name = fake.last_name()
+        middle_name = fake.middle_name()
+        first_name = fake.first_name()
+        full_name = f"{last_name} {first_name} {middle_name}"
         doctors.append(models.Doctor(serviceNumber=str(fake.numerify(text="%%%%%%")),
-                                     fullName=fake.name(),
+                                     fullName=full_name,
                                      specialty=fake.doctor_specialty(),
                                      category=fake.doctor_category(),
                                      rate=fake.numerify(text="%%%%%"),
