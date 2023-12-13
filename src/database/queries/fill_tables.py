@@ -11,8 +11,10 @@ RAW_DATA = [("visit_status", list(database_types.VisitStatus)),
             ("doctor_specialty", list(database_types.DoctorSpecialty)),
             ("doctor_category", list(database_types.DoctorCategory)),
             ("gender", list(database_types.Gender)),
-            ("purpose", ["Scheduled examination", "Pains", "Emergency hospitalization"]),
-            ("diagnose", ["Appendicitis", "Headaches", "Stomachaches"])]
+            ("purpose", ["Профосмотр", "Медосмотр", "Консультация", "Лечение", "Больничный лист"]),
+            ("diagnose", ["Ангина", "Анемия", "Аппендицит", "Артроз", "Астигматизм", "Бронхит",
+                          "Врожденный вывих бедра", "Гастрит", "Гипертония", "Кариес", "Катаракта", "Трахеит",
+                          "Тревожность"])]
 
 
 def fill_tables(visit_number: int = 0,
