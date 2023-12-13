@@ -1,6 +1,7 @@
 from sqlalchemy import select
 
 from database import engine, session_factory
+from database import models
 from database.models import BaseModel, BaseModelType, PkTypes
 from misc import LoggerName, get_logger
 
@@ -12,7 +13,7 @@ def create_tables() -> None:
     BaseModel.metadata.create_all(engine)
 
 
-def insert(orm: BaseModel | list[BaseModel]) -> None:
+def insert(orm: BaseModelType | list[BaseModelType]) -> None:
     with session_factory() as session:
         if isinstance(orm, BaseModel):
             session.add(orm)
@@ -30,3 +31,15 @@ def select_all(orm: type[BaseModelType]) -> list[BaseModelType]:
 def select_by_pk(orm: type[BaseModelType], pk: PkTypes | tuple[PkTypes]) -> BaseModelType:
     with session_factory() as session:
         return session.get(orm, pk)
+
+
+def select_visits_by_patient(patient_medical_card: str) -> list[models.Visit]:
+    with session_factory() as session:
+        query = select(models.Visit).filter_by(medicalCard=patient_medical_card)
+    return list(session.execute(query).scalars().all())
+
+
+def select_doctors_by_section(section: int) -> list[models.Doctor]:
+    with session_factory() as session:
+        query = select(models.Doctor).filter_by(section=section)
+    return list(session.execute(query).scalars().all())
