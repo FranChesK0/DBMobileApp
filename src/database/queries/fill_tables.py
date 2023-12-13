@@ -7,14 +7,16 @@ from misc import LoggerName, get_logger
 from database import database_types, models, queries
 
 logger = get_logger(LoggerName.DATABASE)
-RAW_DATA = [("visit_status", list(database_types.VisitStatus)),
-            ("doctor_specialty", list(database_types.DoctorSpecialty)),
-            ("doctor_category", list(database_types.DoctorCategory)),
-            ("gender", list(database_types.Gender)),
-            ("purpose", ["Профосмотр", "Медосмотр", "Консультация", "Лечение", "Больничный лист"]),
-            ("diagnose", ["Ангина", "Анемия", "Аппендицит", "Артроз", "Астигматизм", "Бронхит",
-                          "Врожденный вывих бедра", "Гастрит", "Гипертония", "Кариес", "Катаракта", "Трахеит",
-                          "Тревожность"])]
+RAW_DATA = {
+    "visit_status": list(database_types.VisitStatus),
+    "doctor_specialty": list(database_types.DoctorSpecialty),
+    "doctor_category": list(database_types.DoctorCategory),
+    "gender": list(database_types.Gender),
+    "purpose": ["Профосмотр", "Медосмотр", "Консультация", "Лечение", "Больничный лист"],
+    "diagnose": ["Ангина", "Анемия", "Аппендицит", "Артроз", "Астигматизм", "Бронхит",
+                 "Врожденный вывих бедра", "Гастрит", "Гипертония", "Кариес", "Катаракта", "Трахеит",
+                 "Тревожность"]
+}
 
 
 def fill_tables(visit_number: int = 0,
@@ -22,31 +24,33 @@ def fill_tables(visit_number: int = 0,
                 patient_number: int = 0,
                 section_number: int = 0,
                 street_number: int = 0,
-                diagnose_number: int = 0,
-                purpose_number: int = 0) -> None:
+                diagnose: bool = False,
+                purpose: bool = False) -> None:
     fake = Faker("ru_RU")
-    for name, elements in RAW_DATA:
+    for name, elements in RAW_DATA.items():
         fake.add_provider(DynamicProvider(provider_name=name, elements=elements))
 
-    _fill_purpose_table(fake, purpose_number)
-    _fill_diagnose_table(fake, diagnose_number)
+    if purpose:
+        _fill_purpose_table()
+    if diagnose:
+        _fill_diagnose_table()
     _fill_section_table(fake, section_number, street_number)
     _fill_patient_table(fake, patient_number)
     _fill_doctor_table(fake, doctor_number)
     _fill_visit_table(fake, visit_number)
 
 
-def _fill_purpose_table(fake: Faker, num: int) -> None:
+def _fill_purpose_table() -> None:
     purposes = []
-    for _ in range(num):
-        purposes.append(models.Purpose(purpose=fake.purpose()))
+    for purpose in RAW_DATA.get("purpose"):
+        purposes.append(models.Purpose(purpose=purpose))
     queries.insert(purposes)
 
 
-def _fill_diagnose_table(fake: Faker, num: int) -> None:
+def _fill_diagnose_table() -> None:
     diagnoses = []
-    for _ in range(num):
-        diagnoses.append(models.Diagnose(diagnose=fake.diagnose()))
+    for diagnose in RAW_DATA.get("diagnose"):
+        diagnoses.append(models.Diagnose(diagnose=diagnose))
     queries.insert(diagnoses)
 
 
@@ -62,7 +66,10 @@ def _fill_patient_table(fake: Faker, num: int) -> None:
     patients = []
     for _ in range(num):
         gender = fake.gender()
-        full_name = fake.name_male() if gender == database_types.Gender.male else fake.name_female()
+        last_name = fake.last_name_male() if gender == database_types.Gender.male else fake.last_name_female()
+        middle_name = fake.middle_name_male() if gender == database_types.Gender.male else fake.middle_name_female()
+        first_name = fake.first_name_male() if gender == database_types.Gender.male else fake.first_name_female()
+        full_name = f"{last_name} {middle_name} {first_name}"
         section = fake.random_element(elements=queries.select_all(models.Section))
         patients.append(models.Patient(medicalCard=str(fake.numerify(text="%%%%%%%%%%%%")),
                                        insurancePolicy=str(fake.numerify(text="%%%%%%%%%%%")),
