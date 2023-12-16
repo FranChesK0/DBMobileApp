@@ -1,6 +1,5 @@
 from datetime import date
 from typing import TypeVar
-from abc import abstractmethod
 
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
@@ -12,9 +11,9 @@ type PkTypes = int | str | date
 
 
 class BaseModel(DeclarativeBase):
-    @abstractmethod
-    def __str__(self) -> str:
-        raise NotImplementedError
+    def __repr__(self) -> str:
+        cols = [f"{col}={getattr(self, col)}" for col in self.__table__.columns.keys()]
+        return f"<{self.__class__.__name__}: {','.join(cols)}>"
 
 
 class Visit(BaseModel):
@@ -28,15 +27,6 @@ class Visit(BaseModel):
     purpose: Mapped[int | None] = mapped_column(ForeignKey("purpose.id", ondelete="SET NULL"))
     status: Mapped[VisitStatus]
 
-    def __str__(self) -> str:
-        return (f"visitNumber: {self.visitNumber}\n"
-                f"visitDate: {self.visitDate}\n"
-                f"medicalCard: {self.medicalCard}\n"
-                f"serviceNumber: {self.serviceNumber}\n"
-                f"diagnose: {self.diagnose}\n"
-                f"purpose: {self.purpose}\n"
-                f"status: {self.status}\n")
-
 
 class Doctor(BaseModel):
     __tablename__ = "doctor"
@@ -47,14 +37,6 @@ class Doctor(BaseModel):
     category: Mapped[DoctorCategory]
     rate: Mapped[int]
     section: Mapped[int]
-
-    def __str__(self) -> str:
-        return (f"serviceNumber: {self.serviceNumber}\n"
-                f"fullName: {self.fullName}\n"
-                f"specialty: {self.specialty}\n"
-                f"category: {self.category}\n"
-                f"rate: {self.rate}\n"
-                f"section: {self.section}\n")
 
 
 class Patient(BaseModel):
@@ -69,26 +51,12 @@ class Patient(BaseModel):
     house: Mapped[str]
     section: Mapped[int | None] = mapped_column(ForeignKey("section.id", ondelete="SET NULL"))
 
-    def __str__(self) -> str:
-        return (f"medicalCard: {self.medicalCard}\n"
-                f"insurancePolicy: {self.insurancePolicy}\n"
-                f"fullName: {self.fullName}\n"
-                f"gender: {self.gender}\n"
-                f"birthDate: {self.birthDate}\n"
-                f"street: {self.street}\n"
-                f"house: {self.house}\n"
-                f"Section: {self.section}\n")
-
 
 class Section(BaseModel):
     __tablename__ = "section"
 
     id: Mapped[int_pk]
     addresses: Mapped[str]
-
-    def __str__(self) -> str:
-        return (f"id: {self.id}\n"
-                f"addresses: {self.addresses}\n")
 
 
 class Diagnose(BaseModel):
@@ -97,17 +65,9 @@ class Diagnose(BaseModel):
     id: Mapped[int_pk]
     diagnose: Mapped[str]
 
-    def __str__(self) -> str:
-        return (f"id: {self.id}\n"
-                f"diagnose: {self.diagnose}\n")
-
 
 class Purpose(BaseModel):
     __tablename__ = "purpose"
 
     id: Mapped[int_pk]
     purpose: Mapped[str]
-
-    def __str__(self) -> str:
-        return (f"id: {self.id}\n"
-                f"purpose: {self.purpose}\n")
