@@ -19,11 +19,11 @@ RAW_DATA = {
 }
 
 
-def fill_tables(visit_number: int = 0,
-                doctor_number: int = 0,
-                patient_number: int = 0,
-                section_number: int = 0,
-                street_number: int = 0) -> None:
+async def fill_tables(visit_number: int = 0,
+                      doctor_number: int = 0,
+                      patient_number: int = 0,
+                      section_number: int = 0,
+                      street_number: int = 0) -> None:
     fake = Faker("ru_RU")
     for name, elements in RAW_DATA.items():
         fake.add_provider(DynamicProvider(provider_name=name, elements=elements))
@@ -31,10 +31,19 @@ def fill_tables(visit_number: int = 0,
     purposes = _get_purposes()
     diagnoses = _get_diagnoses()
     sections = _get_sections(fake, section_number, street_number)
-    patients = _get_patients(fake, patient_number, sections)
-    doctors = _get_doctors(fake, doctor_number, sections)
-    visits = _get_visits(fake, visit_number, patients, doctors, diagnoses, purposes)
-    queries.insert(purposes + diagnoses + sections + patients + doctors + visits)
+    await queries.insert(purposes + diagnoses + sections)
+
+    patients = await _get_patients(fake, patient_number)
+    doctors = await _get_doctors(fake, doctor_number)
+    logger.debug(type(patients))
+    logger.debug(type(doctors))
+    await queries.insert(patients + doctors)
+
+    visits = await _get_visits(fake, visit_number)
+    await queries.insert(visits)
+
+    await queries.insert(doctors + visits)
+    logger.info(f"Database filled with data")
 
 
 def _get_purposes() -> list[models.Purpose]:
@@ -59,7 +68,8 @@ def _get_sections(fake: Faker, section_num: int, street_num: int) -> list[models
     return sections
 
 
-def _get_patients(fake: Faker, num: int, sections: list[models.Section]) -> list[models.Patient]:
+async def _get_patients(fake: Faker, num: int) -> list[models.Patient]:
+    sections = await queries.select_all(models.Section)
     patients = []
     for _ in range(num):
         gender = fake.gender()
@@ -75,12 +85,13 @@ def _get_patients(fake: Faker, num: int, sections: list[models.Section]) -> list
                                        birth_date=fake.date_of_birth(),
                                        street=fake.random_element(elements=section.addresses.split(";")),
                                        house=fake.building_number(),
-                                       section=section.id))
+                                       section_id=section.id))
     return patients
 
 
-def _get_doctors(fake: Faker, num: int, sections: list[models.Section]) -> list[models.Doctor]:
+async def _get_doctors(fake: Faker, num: int) -> list[models.Doctor]:
     doctors = []
+    sections = await queries.select_all(models.Section)
     for _ in range(num):
         section = fake.random_element(elements=sections)
         last_name = fake.last_name()
@@ -91,14 +102,17 @@ def _get_doctors(fake: Faker, num: int, sections: list[models.Section]) -> list[
                                      full_name=full_name,
                                      specialty=fake.doctor_specialty(),
                                      category=fake.doctor_category(),
-                                     rate=fake.numerify(text="%%%%%"),
-                                     section=section.id))
+                                     rate=int(fake.numerify(text="%%%%%")),
+                                     section_id=section.id))
     return doctors
 
 
-def _get_visits(fake: Faker, num: int, patients: list[models.Patient], doctors: list[models.Doctor],
-                diagnoses: list[models.Diagnose], purposes: list[models.Purpose]) -> list[models.Visit]:
+async def _get_visits(fake: Faker, num: int) -> list[models.Visit]:
     visits = []
+    patients = await queries.select_all(models.Patient)
+    doctors = await queries.select_all(models.Doctor)
+    diagnoses = await queries.select_all(models.Diagnose)
+    purposes = await queries.select_all(models.Purpose)
     for _ in range(num):
         patient = fake.random_element(elements=patients)
         doctor = fake.random_element(elements=doctors)
@@ -109,7 +123,7 @@ def _get_visits(fake: Faker, num: int, patients: list[models.Patient], doctors: 
                                                                 end_date=date(2024, 12, 31)),
                                    medical_card=patient.medical_card,
                                    service_number=doctor.service_number,
-                                   diagnose=diagnose.id,
-                                   purpose=purpose.id,
+                                   diagnose_id=diagnose.id,
+                                   purpose_id=purpose.id,
                                    status=fake.visit_status()))
     return visits

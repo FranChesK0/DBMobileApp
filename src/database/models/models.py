@@ -3,6 +3,7 @@ from datetime import date
 from typing import TypeVar
 
 from sqlalchemy import ForeignKey
+from sqlalchemy.ext.asyncio import AsyncAttrs
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 from database.database_types import int_pk, str_pk, VisitStatus, DoctorSpecialty, DoctorCategory, Gender
@@ -10,7 +11,7 @@ from database.database_types import int_pk, str_pk, VisitStatus, DoctorSpecialty
 BaseModelType = TypeVar("BaseModelType", bound="BaseModel")
 
 
-class BaseModel(DeclarativeBase):
+class BaseModel(AsyncAttrs, DeclarativeBase):
     def __repr__(self) -> str:
         cols = [f"{col}={getattr(self, col)}" for col in self.__table__.columns.keys()]
         return f"<{self.__class__.__name__}: {','.join(cols)}>"
