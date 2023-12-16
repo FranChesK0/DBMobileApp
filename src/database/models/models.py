@@ -8,7 +8,6 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from database.database_types import int_pk, str_pk, VisitStatus, DoctorSpecialty, DoctorCategory, Gender
 
 BaseModelType = TypeVar("BaseModelType", bound="BaseModel")
-type PkTypes = int | str | date
 
 
 class BaseModel(DeclarativeBase):
