@@ -22,11 +22,16 @@ class Visit(BaseModel):
 
     visit_number: Mapped[int_pk]
     visit_date: Mapped[date] = mapped_column(primary_key=True)
-    medical_card: Mapped[str] = mapped_column(ForeignKey("patient.medicalCard", ondelete="CASCADE"))
-    service_number: Mapped[str] = mapped_column(ForeignKey("doctor.serviceNumber", ondelete="CASCADE"))
+    medical_card: Mapped[str] = mapped_column(ForeignKey("patient.medical_card", ondelete="CASCADE"))
+    service_number: Mapped[str] = mapped_column(ForeignKey("doctor.service_number", ondelete="CASCADE"))
     diagnose_id: Mapped[int | None] = mapped_column(ForeignKey("diagnose.id", ondelete="SET NULL"))
     purpose_id: Mapped[int | None] = mapped_column(ForeignKey("purpose.id", ondelete="SET NULL"))
     status: Mapped[VisitStatus]
+
+    patient: Mapped[Patient] = relationship(back_populates="visits")
+    doctor: Mapped[Doctor] = relationship(back_populates="visits")
+    diagnose: Mapped[Diagnose] = relationship(back_populates="visits")
+    purpose: Mapped[Purpose] = relationship(back_populates="visits")
 
 
 class Doctor(BaseModel):
@@ -37,7 +42,10 @@ class Doctor(BaseModel):
     specialty: Mapped[DoctorSpecialty]
     category: Mapped[DoctorCategory]
     rate: Mapped[int]
-    section: Mapped[int]
+    section_id: Mapped[int | None] = mapped_column(ForeignKey("section.id", ondelete="SET NULL"))
+
+    visits: Mapped[list[Visit]] = relationship(back_populates="doctor")
+    section: Mapped[Section] = relationship(back_populates="doctors")
 
 
 class Patient(BaseModel):
@@ -52,12 +60,18 @@ class Patient(BaseModel):
     house: Mapped[str]
     section_id: Mapped[int | None] = mapped_column(ForeignKey("section.id", ondelete="SET NULL"))
 
+    visits: Mapped[list[Visit]] = relationship(back_populates="patient")
+    section: Mapped[Section] = relationship(back_populates="patients")
+
 
 class Section(BaseModel):
     __tablename__ = "section"
 
     id: Mapped[int_pk]
     addresses: Mapped[str]
+
+    patients: Mapped[list[Patient]] = relationship(back_populates="section")
+    doctors: Mapped[list[Doctor]] = relationship(back_populates="section")
 
 
 class Diagnose(BaseModel):
@@ -66,9 +80,13 @@ class Diagnose(BaseModel):
     id: Mapped[int_pk]
     diagnose: Mapped[str]
 
+    visits: Mapped[list[Visit]] = relationship(back_populates="diagnose")
+
 
 class Purpose(BaseModel):
     __tablename__ = "purpose"
 
     id: Mapped[int_pk]
     purpose: Mapped[str]
+
+    visits: Mapped[list[Visit]] = relationship(back_populates="purpose")
