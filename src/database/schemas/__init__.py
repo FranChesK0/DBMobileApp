@@ -1,4 +1,5 @@
-from .base import (BaseVisitDTOType, BaseVisitDTO,
+from .base import (BaseDTO,
+                   BaseVisitDTOType, BaseVisitDTO,
                    BaseDoctorDTOType, BaseDoctorDTO,
                    BasePatientDTOType, BasePatientDTO,
                    BaseSectionDTOType, BaseSectionDTO,
@@ -12,6 +13,7 @@ from .schemas import (VisitAddDTO, VisitDTO, VisitRelDTO,
                       PurposeAddDTO, PurposeDTO, PurposeRelDTO)
 
 __all__ = [
+    "BaseDTO",
     "BaseVisitDTOType", "BaseVisitDTO",
     "BaseDoctorDTOType", "BaseDoctorDTO",
     "BasePatientDTOType", "BasePatientDTO",
