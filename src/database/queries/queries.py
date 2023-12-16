@@ -49,3 +49,9 @@ def select_doctors_by_section(section: int) -> list[models.Doctor]:
     with session_factory() as session:
         query = select(models.Doctor).filter_by(section=section)
     return list(session.execute(query).scalars().all())
+
+
+def select_patients_by_section(section: int) -> list[models.Patient]:
+    with session_factory() as session:
+        query = select(models.Patient).filter_by(section=section)
+    return list(session.execute(query).scalars().all())
