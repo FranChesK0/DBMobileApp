@@ -71,11 +71,11 @@ def _fill_patient_table(fake: Faker, num: int) -> None:
         first_name = fake.first_name_male() if gender == database_types.Gender.male else fake.first_name_female()
         full_name = f"{last_name} {first_name} {middle_name}"
         section = fake.random_element(elements=queries.select_all(models.Section))
-        patients.append(models.Patient(medicalCard=str(fake.numerify(text="%%%%%%%%%%%%")),
-                                       insurancePolicy=str(fake.numerify(text="%%%%%%%%%%%")),
-                                       fullName=full_name,
+        patients.append(models.Patient(medical_card=str(fake.numerify(text="%%%%%%%%%%%%")),
+                                       insurance_policy=str(fake.numerify(text="%%%%%%%%%%%")),
+                                       full_name=full_name,
                                        gender=gender,
-                                       birthDate=fake.date_of_birth(),
+                                       birth_date=fake.date_of_birth(),
                                        street=fake.random_element(elements=section.addresses.split(";")),
                                        house=fake.building_number(),
                                        section=section.id))
@@ -90,8 +90,8 @@ def _fill_doctor_table(fake: Faker, num: int) -> None:
         middle_name = fake.middle_name()
         first_name = fake.first_name()
         full_name = f"{last_name} {first_name} {middle_name}"
-        doctors.append(models.Doctor(serviceNumber=str(fake.numerify(text="%%%%%%")),
-                                     fullName=full_name,
+        doctors.append(models.Doctor(service_number=str(fake.numerify(text="%%%%%%")),
+                                     full_name=full_name,
                                      specialty=fake.doctor_specialty(),
                                      category=fake.doctor_category(),
                                      rate=fake.numerify(text="%%%%%"),
@@ -106,11 +106,11 @@ def _fill_visit_table(fake: Faker, num: int) -> None:
         doctor = fake.random_element(elements=queries.select_all(models.Doctor))
         diagnose = fake.random_element(elements=queries.select_all(models.Diagnose))
         purpose = fake.random_element(elements=queries.select_all(models.Purpose))
-        visits.append(models.Visit(visitNumber=fake.random_int(1, 40),
-                                   visitDate=fake.date_between(start_date=date(2023, 1, 1),
-                                                               end_date=date(2024, 12, 31)),
-                                   medicalCard=patient.medicalCard,
-                                   serviceNumber=doctor.serviceNumber,
+        visits.append(models.Visit(visit_number=fake.random_int(1, 40),
+                                   visit_date=fake.date_between(start_date=date(2023, 1, 1),
+                                                                end_date=date(2024, 12, 31)),
+                                   medical_card=patient.medicalCard,
+                                   service_number=doctor.serviceNumber,
                                    diagnose=diagnose.id,
                                    purpose=purpose.id,
                                    status=fake.visit_status()))

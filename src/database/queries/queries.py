@@ -35,13 +35,13 @@ def select_by_pk(orm: type[BaseModelType], pk: PkTypes | tuple[PkTypes]) -> Base
 
 def select_visits_by_patient(patient_medical_card: str) -> list[models.Visit]:
     with session_factory() as session:
-        query = select(models.Visit).filter_by(medicalCard=patient_medical_card)
+        query = select(models.Visit).filter_by(medical_card=patient_medical_card)
     return list(session.execute(query).scalars().all())
 
 
 def select_visits_by_doctor(doctor_service_number: str) -> list[models.Visit]:
     with session_factory() as session:
-        query = select(models.Visit).filter_by(serviceNumber=doctor_service_number)
+        query = select(models.Visit).filter_by(service_number=doctor_service_number)
     return list(session.execute(query).scalars().all())
 
 

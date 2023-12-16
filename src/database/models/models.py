@@ -1,8 +1,9 @@
+from __future__ import annotations
 from datetime import date
 from typing import TypeVar
 
 from sqlalchemy import ForeignKey
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 from database.database_types import int_pk, str_pk, VisitStatus, DoctorSpecialty, DoctorCategory, Gender
 
@@ -19,20 +20,20 @@ class BaseModel(DeclarativeBase):
 class Visit(BaseModel):
     __tablename__ = "visit"
 
-    visitNumber: Mapped[int_pk]
-    visitDate: Mapped[date] = mapped_column(primary_key=True)
-    medicalCard: Mapped[str] = mapped_column(ForeignKey("patient.medicalCard", ondelete="CASCADE"))
-    serviceNumber: Mapped[str] = mapped_column(ForeignKey("doctor.serviceNumber", ondelete="CASCADE"))
-    diagnose: Mapped[int | None] = mapped_column(ForeignKey("diagnose.id", ondelete="SET NULL"))
-    purpose: Mapped[int | None] = mapped_column(ForeignKey("purpose.id", ondelete="SET NULL"))
+    visit_number: Mapped[int_pk]
+    visit_date: Mapped[date] = mapped_column(primary_key=True)
+    medical_card: Mapped[str] = mapped_column(ForeignKey("patient.medicalCard", ondelete="CASCADE"))
+    service_number: Mapped[str] = mapped_column(ForeignKey("doctor.serviceNumber", ondelete="CASCADE"))
+    diagnose_id: Mapped[int | None] = mapped_column(ForeignKey("diagnose.id", ondelete="SET NULL"))
+    purpose_id: Mapped[int | None] = mapped_column(ForeignKey("purpose.id", ondelete="SET NULL"))
     status: Mapped[VisitStatus]
 
 
 class Doctor(BaseModel):
     __tablename__ = "doctor"
 
-    serviceNumber: Mapped[str_pk]
-    fullName: Mapped[str]
+    service_number: Mapped[str_pk]
+    full_name: Mapped[str]
     specialty: Mapped[DoctorSpecialty]
     category: Mapped[DoctorCategory]
     rate: Mapped[int]
@@ -42,14 +43,14 @@ class Doctor(BaseModel):
 class Patient(BaseModel):
     __tablename__ = "patient"
 
-    medicalCard: Mapped[str_pk]
-    insurancePolicy: Mapped[str]
-    fullName: Mapped[str]
+    medical_card: Mapped[str_pk]
+    insurance_policy: Mapped[str]
+    full_name: Mapped[str]
     gender: Mapped[Gender]
-    birthDate: Mapped[date]
+    birth_date: Mapped[date]
     street: Mapped[str]
     house: Mapped[str]
-    section: Mapped[int | None] = mapped_column(ForeignKey("section.id", ondelete="SET NULL"))
+    section_id: Mapped[int | None] = mapped_column(ForeignKey("section.id", ondelete="SET NULL"))
 
 
 class Section(BaseModel):
