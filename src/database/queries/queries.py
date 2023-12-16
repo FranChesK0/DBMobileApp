@@ -39,6 +39,12 @@ def select_visits_by_patient(patient_medical_card: str) -> list[models.Visit]:
     return list(session.execute(query).scalars().all())
 
 
+def select_visits_by_doctor(doctor_service_number: str) -> list[models.Visit]:
+    with session_factory() as session:
+        query = select(models.Visit).filter_by(serviceNumber=doctor_service_number)
+    return list(session.execute(query).scalars().all())
+
+
 def select_doctors_by_section(section: int) -> list[models.Doctor]:
     with session_factory() as session:
         query = select(models.Doctor).filter_by(section=section)

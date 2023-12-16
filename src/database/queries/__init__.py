@@ -3,7 +3,8 @@ from .queries import (create_tables,
                       select_all,
                       select_by_pk,
                       select_visits_by_patient,
-                      select_doctors_by_section)
+                      select_visits_by_doctor,
+                      select_doctors_by_section, )
 from .fill_tables import fill_tables
 
 __all__ = [
@@ -12,6 +13,7 @@ __all__ = [
     "select_all",
     "select_by_pk",
     "select_visits_by_patient",
+    "select_visits_by_doctor",
     "select_doctors_by_section",
     "fill_tables"
 ]
