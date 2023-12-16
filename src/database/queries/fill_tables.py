@@ -19,50 +19,57 @@ RAW_DATA = {
 }
 
 
-def fill_tables(visit_number: int = 0,
-                doctor_number: int = 0,
-                patient_number: int = 0,
-                section_number: int = 0,
-                street_number: int = 0,
-                diagnose: bool = False,
-                purpose: bool = False) -> None:
+async def fill_tables(visit_number: int = 0,
+                      doctor_number: int = 0,
+                      patient_number: int = 0,
+                      section_number: int = 0,
+                      street_number: int = 0) -> None:
     fake = Faker("ru_RU")
     for name, elements in RAW_DATA.items():
         fake.add_provider(DynamicProvider(provider_name=name, elements=elements))
 
-    if purpose:
-        _fill_purpose_table()
-    if diagnose:
-        _fill_diagnose_table()
-    _fill_section_table(fake, section_number, street_number)
-    _fill_patient_table(fake, patient_number)
-    _fill_doctor_table(fake, doctor_number)
-    _fill_visit_table(fake, visit_number)
+    purposes = _get_purposes()
+    diagnoses = _get_diagnoses()
+    sections = _get_sections(fake, section_number, street_number)
+    await queries.insert(purposes + diagnoses + sections)
+
+    patients = await _get_patients(fake, patient_number)
+    doctors = await _get_doctors(fake, doctor_number)
+    logger.debug(type(patients))
+    logger.debug(type(doctors))
+    await queries.insert(patients + doctors)
+
+    visits = await _get_visits(fake, visit_number)
+    await queries.insert(visits)
+
+    await queries.insert(doctors + visits)
+    logger.info(f"Database filled with data")
 
 
-def _fill_purpose_table() -> None:
+def _get_purposes() -> list[models.Purpose]:
     purposes = []
     for purpose in RAW_DATA.get("purpose"):
         purposes.append(models.Purpose(purpose=purpose))
-    queries.insert(purposes)
+    return purposes
 
 
-def _fill_diagnose_table() -> None:
+def _get_diagnoses() -> list[models.Diagnose]:
     diagnoses = []
     for diagnose in RAW_DATA.get("diagnose"):
         diagnoses.append(models.Diagnose(diagnose=diagnose))
-    queries.insert(diagnoses)
+    return diagnoses
 
 
-def _fill_section_table(fake: Faker, section_num: int, street_num: int) -> None:
+def _get_sections(fake: Faker, section_num: int, street_num: int) -> list[models.Section]:
     sections = []
     for _ in range(section_num):
         addresses = ";".join([fake.street_name() for _ in range(street_num)])
         sections.append(models.Section(addresses=addresses))
-    queries.insert(sections)
+    return sections
 
 
-def _fill_patient_table(fake: Faker, num: int) -> None:
+async def _get_patients(fake: Faker, num: int) -> list[models.Patient]:
+    sections = await queries.select_all(models.Section)
     patients = []
     for _ in range(num):
         gender = fake.gender()
@@ -70,48 +77,53 @@ def _fill_patient_table(fake: Faker, num: int) -> None:
         middle_name = fake.middle_name_male() if gender == database_types.Gender.male else fake.middle_name_female()
         first_name = fake.first_name_male() if gender == database_types.Gender.male else fake.first_name_female()
         full_name = f"{last_name} {first_name} {middle_name}"
-        section = fake.random_element(elements=queries.select_all(models.Section))
-        patients.append(models.Patient(medicalCard=str(fake.numerify(text="%%%%%%%%%%%%")),
-                                       insurancePolicy=str(fake.numerify(text="%%%%%%%%%%%")),
-                                       fullName=full_name,
+        section = fake.random_element(elements=sections)
+        patients.append(models.Patient(medical_card=str(fake.numerify(text="%%%%%%%%%%%%")),
+                                       insurance_policy=str(fake.numerify(text="%%%%%%%%%%%")),
+                                       full_name=full_name,
                                        gender=gender,
-                                       birthDate=fake.date_of_birth(),
+                                       birth_date=fake.date_of_birth(),
                                        street=fake.random_element(elements=section.addresses.split(";")),
                                        house=fake.building_number(),
-                                       section=section.id))
-    queries.insert(patients)
+                                       section_id=section.id))
+    return patients
 
 
-def _fill_doctor_table(fake: Faker, num: int) -> None:
+async def _get_doctors(fake: Faker, num: int) -> list[models.Doctor]:
     doctors = []
+    sections = await queries.select_all(models.Section)
     for _ in range(num):
-        section = fake.random_element(elements=queries.select_all(models.Section))
+        section = fake.random_element(elements=sections)
         last_name = fake.last_name()
         middle_name = fake.middle_name()
         first_name = fake.first_name()
         full_name = f"{last_name} {first_name} {middle_name}"
-        doctors.append(models.Doctor(serviceNumber=str(fake.numerify(text="%%%%%%")),
-                                     fullName=full_name,
+        doctors.append(models.Doctor(service_number=str(fake.numerify(text="%%%%%%")),
+                                     full_name=full_name,
                                      specialty=fake.doctor_specialty(),
                                      category=fake.doctor_category(),
-                                     rate=fake.numerify(text="%%%%%"),
-                                     section=section.id))
-    queries.insert(doctors)
+                                     rate=int(fake.numerify(text="%%%%%")),
+                                     section_id=section.id))
+    return doctors
 
 
-def _fill_visit_table(fake: Faker, num: int) -> None:
+async def _get_visits(fake: Faker, num: int) -> list[models.Visit]:
     visits = []
+    patients = await queries.select_all(models.Patient)
+    doctors = await queries.select_all(models.Doctor)
+    diagnoses = await queries.select_all(models.Diagnose)
+    purposes = await queries.select_all(models.Purpose)
     for _ in range(num):
-        patient = fake.random_element(elements=queries.select_all(models.Patient))
-        doctor = fake.random_element(elements=queries.select_all(models.Doctor))
-        diagnose = fake.random_element(elements=queries.select_all(models.Diagnose))
-        purpose = fake.random_element(elements=queries.select_all(models.Purpose))
-        visits.append(models.Visit(visitNumber=fake.random_int(1, 40),
-                                   visitDate=fake.date_between(start_date=date(2023, 1, 1),
-                                                               end_date=date(2024, 12, 31)),
-                                   medicalCard=patient.medicalCard,
-                                   serviceNumber=doctor.serviceNumber,
-                                   diagnose=diagnose.id,
-                                   purpose=purpose.id,
+        patient = fake.random_element(elements=patients)
+        doctor = fake.random_element(elements=doctors)
+        diagnose = fake.random_element(elements=diagnoses)
+        purpose = fake.random_element(elements=purposes)
+        visits.append(models.Visit(visit_number=fake.random_int(1, 40),
+                                   visit_date=fake.date_between(start_date=date(2023, 1, 1),
+                                                                end_date=date(2024, 12, 31)),
+                                   medical_card=patient.medical_card,
+                                   service_number=doctor.service_number,
+                                   diagnose_id=diagnose.id,
+                                   purpose_id=purpose.id,
                                    status=fake.visit_status()))
-    queries.insert(visits)
+    return visits

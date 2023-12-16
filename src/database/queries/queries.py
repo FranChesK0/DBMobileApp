@@ -1,57 +1,61 @@
 from sqlalchemy import select
+from sqlalchemy.orm import joinedload, selectinload, contains_eager
 
 from database import engine, session_factory
 from database import models
-from database.models import BaseModel, BaseModelType, PkTypes
+from database.database_types import PkTypes
+from database.models import BaseModel, BaseModelType
 from misc import LoggerName, get_logger
 
 logger = get_logger(LoggerName.DATABASE)
 
 
-def create_tables() -> None:
-    BaseModel.metadata.drop_all(engine)
-    BaseModel.metadata.create_all(engine)
+async def create_tables() -> None:
+    async with engine.begin() as connection:
+        await connection.run_sync(BaseModel.metadata.drop_all)
+        await connection.run_sync(BaseModel.metadata.create_all)
 
 
-def insert(orm: BaseModelType | list[BaseModelType]) -> None:
-    with session_factory() as session:
+async def insert(orm: BaseModelType | list[BaseModelType]) -> None:
+    async with session_factory() as session:
         if isinstance(orm, BaseModel):
             session.add(orm)
         elif isinstance(orm, list):
             session.add_all(orm)
-        session.commit()
+        await session.commit()
 
 
-def select_all(orm: type[BaseModelType]) -> list[BaseModelType]:
-    with session_factory() as session:
-        query = select(orm)
-        return list(session.execute(query).scalars().all())
+async def select_all(orm: type[BaseModelType]) -> list[BaseModelType]:
+    async with session_factory() as session:
+        query = select(orm).options(*_get_options(orm))
+        return list((await session.execute(query)).unique().scalars().all())
 
 
-def select_by_pk(orm: type[BaseModelType], pk: PkTypes | tuple[PkTypes]) -> BaseModelType:
-    with session_factory() as session:
-        return session.get(orm, pk)
+async def select_by_parameter(orm: type[BaseModelType], name: str, value: any) -> list[BaseModelType]:
+    async with session_factory() as session:
+        query = select(orm).options(*_get_options(orm)).filter_by(**{name: value})
+        return list((await session.execute(query)).unique().scalars().all())
 
 
-def select_visits_by_patient(patient_medical_card: str) -> list[models.Visit]:
-    with session_factory() as session:
-        query = select(models.Visit).filter_by(medicalCard=patient_medical_card)
-    return list(session.execute(query).scalars().all())
-
-
-def select_visits_by_doctor(doctor_service_number: str) -> list[models.Visit]:
-    with session_factory() as session:
-        query = select(models.Visit).filter_by(serviceNumber=doctor_service_number)
-    return list(session.execute(query).scalars().all())
-
-
-def select_doctors_by_section(section: int) -> list[models.Doctor]:
-    with session_factory() as session:
-        query = select(models.Doctor).filter_by(section=section)
-    return list(session.execute(query).scalars().all())
-
-
-def select_patients_by_section(section: int) -> list[models.Patient]:
-    with session_factory() as session:
-        query = select(models.Patient).filter_by(section=section)
-    return list(session.execute(query).scalars().all())
+def _get_options(orm: type[BaseModelType]):
+    match orm:
+        case models.Visit:
+            return (joinedload(models.Visit.patient),
+                    joinedload(models.Visit.doctor),
+                    joinedload(models.Visit.diagnose),
+                    joinedload(models.Visit.purpose))
+        case models.Doctor:
+            return (selectinload(models.Doctor.visits),
+                    joinedload(models.Doctor.section))
+        case models.Patient:
+            return (selectinload(models.Patient.visits),
+                    joinedload(models.Patient.section))
+        case models.Section:
+            return (selectinload(models.Section.doctors),
+                    selectinload(models.Section.patients))
+        case models.Diagnose:
+            return (selectinload(models.Diagnose.visits), )
+        case models.Purpose:
+            return (selectinload(models.Purpose.visits), )
+        case _:
+            return ()

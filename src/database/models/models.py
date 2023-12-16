@@ -1,83 +1,67 @@
+from __future__ import annotations
 from datetime import date
 from typing import TypeVar
-from abc import abstractmethod
 
 from sqlalchemy import ForeignKey
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy.ext.asyncio import AsyncAttrs
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 from database.database_types import int_pk, str_pk, VisitStatus, DoctorSpecialty, DoctorCategory, Gender
 
 BaseModelType = TypeVar("BaseModelType", bound="BaseModel")
-type PkTypes = int | str | date
 
 
-class BaseModel(DeclarativeBase):
-    @abstractmethod
-    def __str__(self) -> str:
-        raise NotImplementedError
+class BaseModel(AsyncAttrs, DeclarativeBase):
+    def __repr__(self) -> str:
+        cols = [f"{col}={getattr(self, col)}" for col in self.__table__.columns.keys()]
+        return f"<{self.__class__.__name__}: {','.join(cols)}>"
 
 
 class Visit(BaseModel):
     __tablename__ = "visit"
 
-    visitNumber: Mapped[int_pk]
-    visitDate: Mapped[date] = mapped_column(primary_key=True)
-    medicalCard: Mapped[str] = mapped_column(ForeignKey("patient.medicalCard", ondelete="CASCADE"))
-    serviceNumber: Mapped[str] = mapped_column(ForeignKey("doctor.serviceNumber", ondelete="CASCADE"))
-    diagnose: Mapped[int | None] = mapped_column(ForeignKey("diagnose.id", ondelete="SET NULL"))
-    purpose: Mapped[int | None] = mapped_column(ForeignKey("purpose.id", ondelete="SET NULL"))
+    visit_number: Mapped[int_pk]
+    visit_date: Mapped[date] = mapped_column(primary_key=True)
+    medical_card: Mapped[str] = mapped_column(ForeignKey("patient.medical_card", ondelete="CASCADE"))
+    service_number: Mapped[str] = mapped_column(ForeignKey("doctor.service_number", ondelete="CASCADE"))
+    diagnose_id: Mapped[int | None] = mapped_column(ForeignKey("diagnose.id", ondelete="SET NULL"))
+    purpose_id: Mapped[int | None] = mapped_column(ForeignKey("purpose.id", ondelete="SET NULL"))
     status: Mapped[VisitStatus]
 
-    def __str__(self) -> str:
-        return (f"visitNumber: {self.visitNumber}\n"
-                f"visitDate: {self.visitDate}\n"
-                f"medicalCard: {self.medicalCard}\n"
-                f"serviceNumber: {self.serviceNumber}\n"
-                f"diagnose: {self.diagnose}\n"
-                f"purpose: {self.purpose}\n"
-                f"status: {self.status}\n")
+    patient: Mapped[Patient] = relationship(back_populates="visits")
+    doctor: Mapped[Doctor] = relationship(back_populates="visits")
+    diagnose: Mapped[Diagnose] = relationship(back_populates="visits")
+    purpose: Mapped[Purpose] = relationship(back_populates="visits")
 
 
 class Doctor(BaseModel):
     __tablename__ = "doctor"
 
-    serviceNumber: Mapped[str_pk]
-    fullName: Mapped[str]
+    service_number: Mapped[str_pk]
+    full_name: Mapped[str]
     specialty: Mapped[DoctorSpecialty]
     category: Mapped[DoctorCategory]
     rate: Mapped[int]
-    section: Mapped[int]
+    section_id: Mapped[int | None] = mapped_column(ForeignKey("section.id", ondelete="SET NULL"))
 
-    def __str__(self) -> str:
-        return (f"serviceNumber: {self.serviceNumber}\n"
-                f"fullName: {self.fullName}\n"
-                f"specialty: {self.specialty}\n"
-                f"category: {self.category}\n"
-                f"rate: {self.rate}\n"
-                f"section: {self.section}\n")
+    visits: Mapped[list[Visit]] = relationship(back_populates="doctor")
+    section: Mapped[Section] = relationship(back_populates="doctors")
 
 
 class Patient(BaseModel):
     __tablename__ = "patient"
 
-    medicalCard: Mapped[str_pk]
-    insurancePolicy: Mapped[str]
-    fullName: Mapped[str]
+    medical_card: Mapped[str_pk]
+    insurance_policy: Mapped[str]
+    full_name: Mapped[str]
     gender: Mapped[Gender]
-    birthDate: Mapped[date]
+    birth_date: Mapped[date]
     street: Mapped[str]
     house: Mapped[str]
-    section: Mapped[int | None] = mapped_column(ForeignKey("section.id", ondelete="SET NULL"))
+    section_id: Mapped[int | None] = mapped_column(ForeignKey("section.id", ondelete="SET NULL"))
 
-    def __str__(self) -> str:
-        return (f"medicalCard: {self.medicalCard}\n"
-                f"insurancePolicy: {self.insurancePolicy}\n"
-                f"fullName: {self.fullName}\n"
-                f"gender: {self.gender}\n"
-                f"birthDate: {self.birthDate}\n"
-                f"street: {self.street}\n"
-                f"house: {self.house}\n"
-                f"Section: {self.section}\n")
+    visits: Mapped[list[Visit]] = relationship(back_populates="patient")
+    section: Mapped[Section] = relationship(back_populates="patients")
 
 
 class Section(BaseModel):
@@ -86,9 +70,8 @@ class Section(BaseModel):
     id: Mapped[int_pk]
     addresses: Mapped[str]
 
-    def __str__(self) -> str:
-        return (f"id: {self.id}\n"
-                f"addresses: {self.addresses}\n")
+    patients: Mapped[list[Patient]] = relationship(back_populates="section")
+    doctors: Mapped[list[Doctor]] = relationship(back_populates="section")
 
 
 class Diagnose(BaseModel):
@@ -97,9 +80,7 @@ class Diagnose(BaseModel):
     id: Mapped[int_pk]
     diagnose: Mapped[str]
 
-    def __str__(self) -> str:
-        return (f"id: {self.id}\n"
-                f"diagnose: {self.diagnose}\n")
+    visits: Mapped[list[Visit]] = relationship(back_populates="diagnose")
 
 
 class Purpose(BaseModel):
@@ -108,6 +89,4 @@ class Purpose(BaseModel):
     id: Mapped[int_pk]
     purpose: Mapped[str]
 
-    def __str__(self) -> str:
-        return (f"id: {self.id}\n"
-                f"purpose: {self.purpose}\n")
+    visits: Mapped[list[Visit]] = relationship(back_populates="purpose")
