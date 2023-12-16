@@ -1,4 +1,5 @@
 from sqlalchemy import select
+from sqlalchemy.orm import joinedload, selectinload, contains_eager
 
 from database import engine, session_factory
 from database import models
@@ -24,8 +25,30 @@ def insert(orm: BaseModelType | list[BaseModelType]) -> None:
 
 def select_all(orm: type[BaseModelType]) -> list[BaseModelType]:
     with session_factory() as session:
-        query = select(orm)
-        return list(session.execute(query).scalars().all())
+        match orm:
+            case models.Visit:
+                query = select(orm).options(joinedload(models.Visit.patient),
+                                            joinedload(models.Visit.doctor),
+                                            joinedload(models.Visit.diagnose),
+                                            joinedload(models.Visit.purpose))
+            case models.Doctor:
+                query = select(orm).options(selectinload(models.Doctor.visits),
+                                            joinedload(models.Doctor.section))
+            case models.Patient:
+                query = select(orm).options(selectinload(models.Patient.visits),
+                                            joinedload(models.Patient.section))
+            case models.Section:
+                query = select(orm).options(selectinload(models.Section.doctors),
+                                            selectinload(models.Section.patients))
+            case models.Diagnose:
+                query = select(orm).options(selectinload(models.Diagnose.visits))
+            case models.Purpose:
+                query = select(orm).options(selectinload(models.Purpose.visits))
+            case _:
+                query = None
+
+    if query is not None:
+        return list(session.execute(query).unique().scalars().all())
 
 
 def select_by_pk(orm: type[BaseModelType], pk: PkTypes | tuple[PkTypes]) -> BaseModelType:
