@@ -50,3 +50,10 @@ async def update(table: type[TableType], pk: PkTypes | tuple[PkTypes], column: s
         orm = await session.get(table.ORM, pk)
         orm.__setattr__(column, value)
         await session.commit()
+
+
+async def delete(table: type[TableType], pk: PkTypes | tuple[PkTypes]) -> None:
+    async with session_factory() as session:
+        orm = await session.get(table.ORM, pk)
+        await session.delete(orm)
+        await session.commit()
