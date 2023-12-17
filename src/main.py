@@ -12,7 +12,12 @@ async def main(page: ft.Page) -> None:
 
     async def change_route(route):
         page.views.clear()
-        ...
+
+        if page.route == Routes.LOGIN.value:
+            page.views.append(views.authorization_views.LoginView(page))
+        if page.route == Routes.REGISTER.value:
+            page.views.append(views.authorization_views.RegisterView(page))
+
         await page.update_async()
 
     page.views.append(views.authorization_views.LoginView(page))
