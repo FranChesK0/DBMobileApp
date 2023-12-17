@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import TypeVar, Callable
+from typing import TypeVar, Callable, Coroutine
 
 import flet as ft
 
@@ -10,7 +10,7 @@ PopupMenuButtonType = TypeVar("PopupMenuButtonType", bound="BasePopupMenuButton"
 
 
 class BaseElevatedButton(ABC, ft.ElevatedButton):
-    def __init__(self, text: str, on_click: Callable):
+    def __init__(self, text: str, on_click: Callable[[ft.ControlEvent], Coroutine]):
         super().__init__(text=text,
                          bgcolor=Settings.SECONDARY_COLOR,
                          color=Settings.ACCENT_COLOR,
