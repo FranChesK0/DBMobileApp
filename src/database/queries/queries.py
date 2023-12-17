@@ -43,3 +43,10 @@ async def select_by_column(table: type[TableType], column: str, value: any,
                  select(table.ORM).filter_by(**{column: value}))
         return [dto.model_validate(row, from_attributes=True)
                 for row in (await session.execute(query)).unique().scalars().all()]
+
+
+async def update(table: type[TableType], pk: PkTypes | tuple[PkTypes], column: str, value: any) -> None:
+    async with session_factory() as session:
+        orm = await session.get(table.ORM, pk)
+        orm.__setattr__(column, value)
+        await session.commit()
