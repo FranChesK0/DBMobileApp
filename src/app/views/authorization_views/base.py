@@ -34,7 +34,6 @@ class BaseAuthorizationView(ABC, ft.View):
             color=Settings.ACCENT_COLOR,
             border_color=Settings.ACCENT_COLOR,
             cursor_color=Settings.ACCENT_COLOR,
-            width=Settings.CONTAINER_WIDTH,
             on_focus=self.start_animation,
             on_blur=self.stop_animation
         )
@@ -42,7 +41,6 @@ class BaseAuthorizationView(ABC, ft.View):
             color=Settings.ACCENT_COLOR,
             border_color=Settings.ACCENT_COLOR,
             cursor_color=Settings.ACCENT_COLOR,
-            width=Settings.CONTAINER_WIDTH,
             on_focus=self.start_animation,
             on_blur=self.stop_animation,
             password=True
