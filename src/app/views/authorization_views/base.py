@@ -27,13 +27,14 @@ class BaseAuthorizationView(ABC, ft.View):
         self.image: ft.Icon = ft.Icon(
             name=icon,
             color=Settings.ACCENT_COLOR,
-            scale=ft.Scale(4),
+            scale=ft.Scale(6),
             animate_scale=ft.Animation(900, ft.AnimationCurve.DECELERATE)
         )
         self.login_field: ft.TextField = ft.TextField(
             color=Settings.ACCENT_COLOR,
             border_color=Settings.ACCENT_COLOR,
             cursor_color=Settings.ACCENT_COLOR,
+            width=Settings.CONTAINER_WIDTH,
             on_focus=self.start_animation,
             on_blur=self.stop_animation
         )
@@ -41,6 +42,7 @@ class BaseAuthorizationView(ABC, ft.View):
             color=Settings.ACCENT_COLOR,
             border_color=Settings.ACCENT_COLOR,
             cursor_color=Settings.ACCENT_COLOR,
+            width=Settings.CONTAINER_WIDTH,
             on_focus=self.start_animation,
             on_blur=self.stop_animation,
             password=True
@@ -50,6 +52,7 @@ class BaseAuthorizationView(ABC, ft.View):
                 minimum=5,
                 content=ft.Column(
                     alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+                    width=self.page.width,
                     controls=[
                         ft.Container(
                             content=ft.Row(
@@ -74,7 +77,7 @@ class BaseAuthorizationView(ABC, ft.View):
                                         controls=[
                                             ft.Text(
                                                 intro,
-                                                size=16,
+                                                size=20,
                                                 color=Settings.ACCENT_COLOR,
                                                 weight=ft.FontWeight.BOLD
                                             )
@@ -87,7 +90,7 @@ class BaseAuthorizationView(ABC, ft.View):
                                             ft.Column(
                                                 spacing=10,
                                                 controls=[
-                                                    ft.Text("Логин", color=Settings.ACCENT_COLOR),
+                                                    ft.Text("Логин", color=Settings.ACCENT_COLOR, size=15),
                                                     self.login_field
                                                 ]
                                             )
@@ -99,7 +102,7 @@ class BaseAuthorizationView(ABC, ft.View):
                                             ft.Column(
                                                 spacing=10,
                                                 controls=[
-                                                    ft.Text("Пароль", color=Settings.ACCENT_COLOR),
+                                                    ft.Text("Пароль", color=Settings.ACCENT_COLOR, size=15),
                                                     self.password_field
                                                 ]
                                             )
@@ -114,8 +117,9 @@ class BaseAuthorizationView(ABC, ft.View):
                                 ]
                             )
                         ),
-                        ft.Divider(color="transparent"),
+                        ft.Divider(height=160, color="transparent"),
                         ft.Container(
+                            alignment=ft.alignment.bottom_center,
                             content=ft.Row(
                                 alignment=ft.MainAxisAlignment.CENTER,
                                 controls=[
@@ -164,15 +168,15 @@ class BaseAuthorizationView(ABC, ft.View):
 
     async def run_animation(self) -> None:
         if self.animation_running:
-            self.image.scale = ft.transform.Scale(4.9)
+            self.image.scale = ft.transform.Scale(6.9)
             await self.image.update_async()
             await asyncio.sleep(0.9)
 
-            self.image.scale = ft.transform.Scale(4)
+            self.image.scale = ft.transform.Scale(6)
             await self.image.update_async()
             await asyncio.sleep(0.9)
 
             await self.run_animation()
         else:
-            self.image.scale = ft.transform.Scale(4)
+            self.image.scale = ft.transform.Scale(6)
             await self.image.update_async()
