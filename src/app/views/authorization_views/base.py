@@ -3,8 +3,8 @@ from abc import ABC, abstractmethod
 
 import flet as ft
 
-from app.routes import Routes
-from app.settings import Settings
+from app import Routes
+from app import Settings
 
 AuthorizationViewType = TypeVar("AuthorizationViewType", bound="BaseAuthorizationView")
 

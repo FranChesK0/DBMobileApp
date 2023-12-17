@@ -1,6 +1,6 @@
 import flet as ft
 
-from app.routes import Routes
+from app import Routes
 from app.views.authorization_views import BaseAuthorizationView
 
 

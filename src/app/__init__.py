@@ -1,7 +1,9 @@
-from . import settings
-from . import routes
+from .settings import Settings
+from .routes import Routes
+from . import views
 
 __all__ = [
-    "settings",
-    "routes"
+    "Settings",
+    "Routes",
+    "views"
 ]
