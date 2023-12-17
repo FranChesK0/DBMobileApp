@@ -9,10 +9,10 @@ TableType = TypeVar("TableType", bound="BaseTable")
 
 
 class BaseTable(ABC):
-    ORM: type[models.BaseModelType] = models.BaseModel
-    DTO: type[schemas.BaseDTOType] = schemas.BaseDTO
-    ADD_DTO: type[schemas.BaseDTOType] = schemas.BaseDTO
-    REL_DTO: type[schemas.BaseDTOType] = schemas.BaseDTO
+    ORM: type[models.BaseModelType] = models.BaseModelType
+    DTO: type[schemas.BaseDTOType] = schemas.BaseDTOType
+    ADD_DTO: type[schemas.BaseDTOType] = schemas.BaseDTOType
+    REL_DTO: type[schemas.BaseDTOType] = schemas.BaseDTOType
     OPTIONS: tuple = tuple()
 
 
