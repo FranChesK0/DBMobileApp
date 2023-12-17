@@ -1,11 +1,14 @@
 from __future__ import annotations
 from datetime import date
+from typing import TypeVar
 
 from sqlalchemy import ForeignKey
 from sqlalchemy.ext.asyncio import AsyncAttrs
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 from database.database_types import int_pk, str_pk, VisitStatus, DoctorSpecialty, DoctorCategory, Gender
+
+BaseModelType = TypeVar("BaseModelType", bound="BaseModel")
 
 
 class BaseModel(AsyncAttrs, DeclarativeBase):
