@@ -9,8 +9,8 @@ class VisitAddDTO(BaseVisitDTO):
     visit_date: date
     medical_card: str
     service_number: str
-    diagnose_id: int
-    purpose_id: int
+    diagnose_id: int | None
+    purpose_id: int | None
     status: VisitStatus
 
 
@@ -24,7 +24,7 @@ class DoctorAddDTO(BaseDoctorDTO):
     specialty: DoctorSpecialty
     category: DoctorCategory
     rate: int
-    section_id: int
+    section_id: int | None
 
 
 class DoctorDTO(DoctorAddDTO):
@@ -39,7 +39,7 @@ class PatientAddDTO(BasePatientDTO):
     birth_date: date
     street: str
     house: str
-    section_id: int
+    section_id: int | None
 
 
 class PatientDTO(PatientAddDTO):
