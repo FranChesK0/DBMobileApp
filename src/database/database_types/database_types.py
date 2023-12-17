@@ -9,13 +9,13 @@ str_pk = Annotated[str, mapped_column(primary_key=True)]
 type PkTypes = int | str | date
 
 
-class VisitStatus(Enum):
+class VisitStatus(str, Enum):
     primary = "Первичный"
     repeated = "Повторный"
     diagnose = "Диагноз"
 
 
-class DoctorSpecialty(Enum):
+class DoctorSpecialty(str, Enum):
     allergist = "Аллерголог"
     dermatologist = "Дерматолог"
     cardiologist = "Кардиолог"
@@ -28,12 +28,12 @@ class DoctorSpecialty(Enum):
     surgeon = "Хирург"
 
 
-class DoctorCategory(Enum):
+class DoctorCategory(str, Enum):
     second = "Вторая"
     first = "Первая"
     higher = "Высшая"
 
 
-class Gender(Enum):
+class Gender(str, Enum):
     male = "Мужчина"
     female = "Женщина"
