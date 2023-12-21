@@ -1,7 +1,15 @@
 from datetime import date
+from typing import TypeVar
 
-from database.schemas import BaseDTO
+from pydantic import BaseModel
+
 from database.database_types import VisitStatus, DoctorSpecialty, DoctorCategory, Gender
+
+BaseDTOType = TypeVar("BaseDTOType", bound="BaseDTO")
+
+
+class BaseDTO(BaseModel):
+    pass
 
 
 class VisitAddDTO(BaseDTO):

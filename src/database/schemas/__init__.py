@@ -1,5 +1,5 @@
-from .base import BaseDTOType, BaseDTO
-from .schemas import (VisitAddDTO, VisitDTO, VisitRelDTO,
+from .schemas import (BaseDTOType, BaseDTO,
+                      VisitAddDTO, VisitDTO, VisitRelDTO,
                       DoctorAddDTO, DoctorDTO, DoctorRelDTO,
                       PatientAddDTO, PatientDTO, PatientRelDTO,
                       SectionAddDTO, SectionDTO, SectionRelDTO,
