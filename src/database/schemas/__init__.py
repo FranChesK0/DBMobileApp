@@ -1,10 +1,4 @@
-from .base import (BaseDTOType, BaseDTO,
-                   BaseVisitDTOType, BaseVisitDTO,
-                   BaseDoctorDTOType, BaseDoctorDTO,
-                   BasePatientDTOType, BasePatientDTO,
-                   BaseSectionDTOType, BaseSectionDTO,
-                   BaseDiagnoseDTOType, BaseDiagnoseDTO,
-                   BasePurposeDTOType, BasePurposeDTO)
+from .base import BaseDTOType, BaseDTO
 from .schemas import (VisitAddDTO, VisitDTO, VisitRelDTO,
                       DoctorAddDTO, DoctorDTO, DoctorRelDTO,
                       PatientAddDTO, PatientDTO, PatientRelDTO,
@@ -14,12 +8,6 @@ from .schemas import (VisitAddDTO, VisitDTO, VisitRelDTO,
 
 __all__ = [
     "BaseDTOType", "BaseDTO",
-    "BaseVisitDTOType", "BaseVisitDTO",
-    "BaseDoctorDTOType", "BaseDoctorDTO",
-    "BasePatientDTOType", "BasePatientDTO",
-    "BaseSectionDTOType", "BaseSectionDTO",
-    "BaseDiagnoseDTOType", "BaseDiagnoseDTO",
-    "BasePurposeDTOType", "BasePurposeDTO",
     "VisitAddDTO", "VisitDTO", "VisitRelDTO",
     "DoctorAddDTO", "DoctorDTO", "DoctorRelDTO",
     "PatientAddDTO", "PatientDTO", "PatientRelDTO",

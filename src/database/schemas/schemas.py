@@ -1,10 +1,10 @@
 from datetime import date
 
+from database.schemas import BaseDTO
 from database.database_types import VisitStatus, DoctorSpecialty, DoctorCategory, Gender
-from database.schemas import BaseVisitDTO, BaseDoctorDTO, BasePatientDTO, BaseSectionDTO, BaseDiagnoseDTO, BasePurposeDTO
 
 
-class VisitAddDTO(BaseVisitDTO):
+class VisitAddDTO(BaseDTO):
     visit_number: int
     visit_date: date
     medical_card: str
@@ -18,7 +18,7 @@ class VisitDTO(VisitAddDTO):
     pass
 
 
-class DoctorAddDTO(BaseDoctorDTO):
+class DoctorAddDTO(BaseDTO):
     service_number: str
     full_name: str
     specialty: DoctorSpecialty
@@ -31,7 +31,7 @@ class DoctorDTO(DoctorAddDTO):
     pass
 
 
-class PatientAddDTO(BasePatientDTO):
+class PatientAddDTO(BaseDTO):
     medical_card: str
     insurance_policy: str
     full_name: str
@@ -46,7 +46,7 @@ class PatientDTO(PatientAddDTO):
     pass
 
 
-class SectionAddDTO(BaseSectionDTO):
+class SectionAddDTO(BaseDTO):
     addresses: str
 
 
@@ -54,7 +54,7 @@ class SectionDTO(SectionAddDTO):
     id: int
 
 
-class DiagnoseAddDTO(BaseDiagnoseDTO):
+class DiagnoseAddDTO(BaseDTO):
     diagnose: str
 
 
@@ -62,7 +62,7 @@ class DiagnoseDTO(DiagnoseAddDTO):
     id: int
 
 
-class PurposeAddDTO(BasePurposeDTO):
+class PurposeAddDTO(BaseDTO):
     purpose: str
 
 
