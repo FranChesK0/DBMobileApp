@@ -2,7 +2,7 @@ import logging
 from enum import Enum
 from logging import config
 
-from . import Env
+from environment import Env
 
 config.fileConfig(f"{Env.ROOT_DIR}\\data\\logging.conf")
 
