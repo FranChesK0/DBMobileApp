@@ -1,17 +1,4 @@
-from .queries import (create_tables,
-                      insert,
-                      select_all,
-                      select_by_column,
-                      update,
-                      delete)
+from .queries import insert, update, delete, select
 from .fill_tables import fill_tables
 
-__all__ = [
-    "create_tables",
-    "insert",
-    "select_all",
-    "select_by_column",
-    "update",
-    "delete",
-    "fill_tables"
-]
+__all__ = ["insert", "update", "delete", "select", "fill_tables"]

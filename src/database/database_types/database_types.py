@@ -10,30 +10,30 @@ type PkTypes = int | str | date
 
 
 class VisitStatus(str, Enum):
-    primary = "Первичный"
-    repeated = "Повторный"
-    diagnose = "Диагноз"
+    primary = "первичный"
+    repeated = "повторный"
+    diagnose = "диагноз"
 
 
 class DoctorSpecialty(str, Enum):
-    allergist = "Аллерголог"
-    dermatologist = "Дерматолог"
-    cardiologist = "Кардиолог"
-    neurologist = "Невролог"
-    ophthalmologist = "Офтальмолог"
-    pediatrician = "Педиатр"
-    psychotherapist = "Психотерапевт"
-    resuscitator = "Реаниматолог"
-    dentist = "Стоматолог"
-    surgeon = "Хирург"
+    allergist = "аллерголог"
+    dermatologist = "дерматолог"
+    cardiologist = "кардиолог"
+    neurologist = "невролог"
+    ophthalmologist = "офтальмолог"
+    pediatrician = "педиатр"
+    psychotherapist = "психотерапевт"
+    resuscitator = "реаниматолог"
+    dentist = "стоматолог"
+    surgeon = "хирург"
 
 
 class DoctorCategory(str, Enum):
-    second = "Вторая"
-    first = "Первая"
-    higher = "Высшая"
+    second = "вторая"
+    first = "первая"
+    higher = "высшая"
 
 
 class Gender(str, Enum):
-    male = "Мужчина"
-    female = "Женщина"
+    male = "мужчина"
+    female = "женщина"
