@@ -1,8 +1,8 @@
-from misc import LoggerName, get_logger
 from database import session_factory
+from logger import get_logger, LoggerName, Logger
 from database.procedures_functions import InsertProcedure, Function, Returns
 
-logger = get_logger(LoggerName.DATABASE)
+logger: Logger = get_logger(LoggerName.DATABASE)
 
 
 async def insert(procedure: InsertProcedure) -> None:

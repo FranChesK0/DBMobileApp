@@ -1,15 +1,14 @@
-import logging
 from datetime import date
 
 from faker import Faker
 from faker.providers import DynamicProvider
 
-from misc import get_logger, LoggerName
+from logger import get_logger, LoggerName, Logger
 from database.queries import insert, select
 from database.database_types import VisitStatus, DoctorSpecialty, DoctorCategory, Gender
 from database.procedures_functions import insert_procedures, InsertProcedure, select_functions
 
-logger: logging.Logger = get_logger(LoggerName.DATABASE)
+logger: Logger = get_logger(LoggerName.DATABASE)
 RAW_DATA = {
     "visit_status": list(VisitStatus),
     "doctor_specialty": list(DoctorSpecialty),
